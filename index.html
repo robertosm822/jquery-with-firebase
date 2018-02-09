@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Firebase</title>
+
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+
+</head>
+<body>
+
+<div class="container">
+
+
+
+	<div class="row">
+		<div class="col-md-12">
+			<hr>
+			<ul  class="nav navbar-nav"  id="sair">
+				<li>
+					<a href="#" id="btnLogout">Logout</a>
+				</li>
+			</ul>
+			<hr>		
+
+			<div  id="login-modal" >
+	    	  
+					<div class="loginmodal-container">
+						<h1>Entrar</h1><br>
+					  <form>
+						<input type="text" name="txtApelido" id="txtApelido" value="" placeholder="Apelido">
+						<input type="text" id="txtEmail" name="email" placeholder="Email">
+						<input type="password" name="password" id="txtPassword" placeholder="Password">
+						<input type="button" name="login" id="btnLogin" class="login loginmodal-submit" value="ENTRAR" >
+					  </form>
+						
+						<div class="login-help">
+							<a href="#" id="btnSignUp" >Register</a>
+						</div>
+					  
+					</div>
+			</div>
+
+		</div>
+			  
+
+		
+
+		
+
+	</div>
+	<div class="row">
+		
+		<div class="col-md-6" id="form-chat">
+			<div class="form-inline" style="padding-bottom: 40px;">
+				<div class="form-group">
+			      
+			      <input type="text" class="form-control" id="nameinput" placeholder="Digite" name="email">
+			    </div>
+			    
+			    <button type="button" class="btn btn-default" id="submit">OK</button>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<hr>
+		<div id="display" class="col-md-12">
+			<ul class="nav-messages" id="display">
+			</ul>
+			
+		</div>
+	</div>
+</div>
+
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.slim.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyBGZjNg6eFUcZQi4zsPX2iQ_zVoQn78CJ4",
+    authDomain: "chat-firebase-jquery.firebaseapp.com",
+    databaseURL: "https://chat-firebase-jquery.firebaseio.com",
+    projectId: "chat-firebase-jquery",
+    storageBucket: "chat-firebase-jquery.appspot.com",
+    messagingSenderId: "509580839311"
+  };
+  firebase.initializeApp(config);
+
+  var database = firebase.database();
+  var name = "";
+  	const txtEmail 		= document.getElementById('txtEmail');
+	const txtPassword 	= document.getElementById('txtPassword');
+	const btnLogin 		= document.getElementById('btnLogin');
+	const btnLogout 	= document.getElementById('sair');
+	const btnSignUp 	= document.getElementById('btnSignUp');
+	
+
+//tratar retirada de HTML ou script malicioso
+function escapeHtml (string) {
+	return this.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+  $('#submit').on('click',function(e){
+  	var name = $('#nameinput').val().trim();
+
+  	var d = new Date();
+    var s = d.getSeconds();
+    var h= d.getHours();
+    var time = d.getYear()+"."+d.getDay()+"."+h+"."+d.getMinutes()+"."+s;
+  	
+  	if(name != ""){
+	  	//metodo push eh o que grava uma nova linha a tabela 'mensagens'
+	  	database.ref('mensagens').push({
+	  		name: name,
+	  		apelido: $('#txtApelido').val().trim(),
+	  		photo: "https://www.gravatar.com/avatar/"+CryptoJS.MD5("roberto_sm822@yahoo.com.br")+".jpg');",
+	  		order: time
+	  	});
+  	}
+  	
+
+  	mostrarTodos();
+  	$('#nameinput').val("");
+
+  	return false;
+  });
+
+  	//adicionando possibilidade de envio via ENTER do teclado
+  	$('#nameinput').keypress(function (e) {
+  		if (e.which == 13) {
+  			var name = $('#nameinput').val().trim();
+  			
+		  	var d = new Date();
+		    var s = d.getSeconds();
+		    var h= d.getHours();
+		    var time = d.getYear()+"."+d.getDay()+"."+h+"."+d.getMinutes()+"."+s;
+		    //https://s.gravatar.com/avatar/22dda2f90e5a78fdd86fb8d8e25dce3d?s=80
+		    var foto = "https://www.gravatar.com/avatar/"+md5(txtEmail)+".jpg";
+		  	
+		  	if(name != ""){
+			  	//metodo push eh o que grava uma nova linha a tabela 'mensagens'
+			  	database.ref('mensagens').push({
+			  		name: name,
+			  		apelido: $('#txtApelido').val().trim(),
+			  		photo: foto,
+			  		order: time
+			  	});
+		  	}
+		  	mostrarTodos();
+		  	$('#nameinput').val("");
+  		}
+	});
+
+  	//mostrando todos os registros gravados
+  	database.ref('mensagens').on('value',function(snapshot) {
+	  snapshot.forEach(function(data){
+                var val = data.val();
+                //console.log(val.name);
+                //varcontent += "<img width='30' src='"+val.photo+"'> -- "+val.name+"<br>";
+                $('#display').html("<li class='nav-messages'><img width='30' src='"+val.photo+"'>["+val.apelido+"] -- "+val.name+"</li>");
+                //content +='<tr>';
+                //content += '<td>' + val.descripcion + '</td>';
+      });
+	});
+  	
+function mostrarTodos(){
+	var content='';
+	//mostrando todos os registros gravados, limitando pelos ultimos 50 recentes
+  	database.ref('mensagens').limitToLast(25).on('value',function(snapshot) {
+	  snapshot.forEach(function(data){
+                var val = data.val();
+
+                //console.log(val.name);
+                content += "<li class='nav-messages'><img width='30' src='"+val.photo+"'>["+val.apelido+"] -- "+val.name+"</li>";
+                //content +='<tr>';
+                //content += '<td>' + val.descripcion + '</td>';
+      });
+	});
+
+	return $('#display').html(content);
+}
+
+function removeData(){
+	//metodo para apagar todas as mensagens criadas
+	database.ref('mensagens').remove();
+}
+
+	 
+//function logarSe(){
+
+
+	//add login event
+	btnLogin.addEventListener('click', e=>{
+		const email = txtEmail.value;
+		const pass = txtPassword.value;
+		const auth = firebase.auth();
+		//sign in
+		const promise = auth.signInWithEmailAndPassword(email, pass);
+		promise.catch(e => console.log(e.message));
+	});
+
+	//add signup event
+	btnSignUp.addEventListener('click', e => {
+		const email = txtEmail.value;
+		const pass = txtPassword.value;
+		const auth = firebase.auth();
+		//create user
+		const promise = auth.createUserWithEmailAndPassword(email, pass);
+		promise.catch(e => console.log(e.message));
+	});
+
+	//logout
+	btnLogout.addEventListener('click', e => {
+		firebase.auth().signOut();
+	});
+
+	//add realtime Listener
+	firebase.auth().onAuthStateChanged(firebaseUser => {
+		if(firebaseUser){
+			console.log(firebaseUser);
+			
+			btnLogout.style.display = 'block';
+			document.getElementById('login-modal').style.display = "none";
+			document.getElementById('display').style.display = 'block';
+			document.getElementById('form-chat').style.display = 'block';
+		} else {
+			console.log("Nao logado");
+			btnLogout.style.display = 'none';
+			document.getElementById('login-modal').style.display = "block";
+			document.getElementById('display').style.display = 'none';
+			document.getElementById('form-chat').style.display = 'none';
+		}
+	});
+//}
+
+</script>
+</body>
+</html>
