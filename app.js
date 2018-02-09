@@ -36,7 +36,7 @@ function escapeHtml (string) {
 	  	database.ref('mensagens').push({
 	  		name: name,
 	  		apelido: $('#txtApelido').val().trim(),
-	  		photo: "https://www.gravatar.com/avatar/"+CryptoJS.MD5("roberto_sm822@yahoo.com.br")+".jpg');",
+	  		photo: "https://www.gravatar.com/avatar/"+CryptoJS.MD5(name)+".jpg');",
 	  		order: time
 	  	});
   	}
