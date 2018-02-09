@@ -16,6 +16,7 @@
 	const btnLogin 		= document.getElementById('btnLogin');
 	const btnLogout 	= document.getElementById('sair');
 	const btnSignUp 	= document.getElementById('btnSignUp');
+
 	
 
 //tratar retirada de HTML ou script malicioso
@@ -32,11 +33,12 @@ function escapeHtml (string) {
     var time = d.getYear()+"."+d.getDay()+"."+h+"."+d.getMinutes()+"."+s;
   	
   	if(name != ""){
+  		localStorage.setItem('photo', 'http://www.gravatar.com/avatar/'+md5(this.email)+'.jpg');
 	  	//metodo push eh o que grava uma nova linha a tabela 'mensagens'
 	  	database.ref('mensagens').push({
 	  		name: name,
 	  		apelido: $('#txtApelido').val().trim(),
-	  		photo: "https://www.gravatar.com/avatar/"+CryptoJS.MD5(name)+".jpg');",
+	  		photo: localStorage.getItem('photo'),
 	  		order: time
 	  	});
   	}
@@ -52,20 +54,18 @@ function escapeHtml (string) {
   	$('#nameinput').keypress(function (e) {
   		if (e.which == 13) {
   			var name = $('#nameinput').val().trim();
-  			
+  			localStorage.setItem('photo', 'http://www.gravatar.com/avatar/'+md5(this.email)+'.jpg');
 		  	var d = new Date();
 		    var s = d.getSeconds();
 		    var h= d.getHours();
 		    var time = d.getYear()+"."+d.getDay()+"."+h+"."+d.getMinutes()+"."+s;
-		    //https://s.gravatar.com/avatar/22dda2f90e5a78fdd86fb8d8e25dce3d?s=80
-		    var foto = "https://www.gravatar.com/avatar/"+md5(txtEmail)+".jpg";
-		  	
+		  		  	
 		  	if(name != ""){
 			  	//metodo push eh o que grava uma nova linha a tabela 'mensagens'
 			  	database.ref('mensagens').push({
 			  		name: name,
 			  		apelido: $('#txtApelido').val().trim(),
-			  		photo: foto,
+			  		photo: localStorage.getItem('photo'),
 			  		order: time
 			  	});
 		  	}
